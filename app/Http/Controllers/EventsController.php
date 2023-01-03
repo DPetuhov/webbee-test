@@ -187,6 +187,7 @@ class EventsController extends BaseController
     ```
      */
 
+
     public function getFutureEventsWithWorkshops() : Collection
     {
         $events = DB::table('events')->get();
