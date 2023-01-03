@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -107,7 +108,7 @@ class EventsController extends BaseController
     {
         $events = DB::table('events')->get();
         foreach ($events as $event)
-            $event->workshops[] = DB::table('workshops')->where('event_id', $event->id)->get();
+            $event->workshops = DB::table('workshops')->where('event_id', $event->id)->get();
 
         return $events;
     }
@@ -186,7 +187,14 @@ class EventsController extends BaseController
     ```
      */
 
-    public function getFutureEventsWithWorkshops() {
-        throw new \Exception('implement in coding task 2');
+    public function getFutureEventsWithWorkshops() : Collection
+    {
+        $events = DB::table('events')->get();
+        foreach ($events as $event) {
+            $event->workshops = DB::table('workshops')->where('event_id', $event->id)->whereDate('start', '>', Carbon::now())->get();
+            if (!count($event->workshops))
+                unset($event->workshops);
+        }
+        return $events;
     }
 }
